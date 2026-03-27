@@ -54,16 +54,12 @@ class SendEmailRecipientJob implements ShouldQueue
 
         $publicBaseUrl = rtrim((string) env('BULKMAIL_PUBLIC_BASE_URL', 'http://localhost:8000'), '/');
 
-        $unsubscribeUrl = $publicBaseUrl.'/unsubscribe/'.$recipient->unsubscribe_token;
         $openPixelUrl = $publicBaseUrl.'/track/open/'.$recipient->open_token;
 
         $trackingPixelHtml = '<img src="'.$openPixelUrl.'" width="1" height="1" style="display:none" alt="" />';
-        $unsubscribeLinkHtml = '<div style="margin-top:16px;font-size:12px;color:#666;">'
-            .'<a href="'.$unsubscribeUrl.'">Unsubscribe</a>'
-            .'</div>';
 
-        // `body_html` is stored as a sanitized fragment; we append tracking + unsubscribe per recipient.
-        $finalHtml = rtrim($batch->body_html)."\n".$trackingPixelHtml."\n".$unsubscribeLinkHtml;
+        // `body_html` is stored as a sanitized fragment; we append open tracking per recipient.
+        $finalHtml = rtrim($batch->body_html)."\n".$trackingPixelHtml;
 
         $subject = $batch->subject_plain ?? strip_tags((string) $batch->subject_html);
 
